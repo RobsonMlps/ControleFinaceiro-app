@@ -1,4 +1,4 @@
-export interface Transacao {
+export interface ISTransacao {
   id: string;
   categoria: string;
   valor: number;

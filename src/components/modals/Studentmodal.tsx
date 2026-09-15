@@ -1,0 +1,119 @@
+import React from "react";
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+export type StudentModalProps = {
+  visible: boolean;
+  onAdd: (title: string, subtitle: string) => void;
+  onClose: () => void;
+};
+
+export default function StudentModal({
+  visible,
+  onAdd,
+  onClose,
+}: StudentModalProps) {
+  const [title, setTitle] = React.useState("");
+  const [subtitle, setSubtitle] = React.useState("");
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent={true}
+      onRequestClose={() => {}}
+    >
+      <view style={styles.container}>
+        <View style={styles.boxContainer}>
+          <TextInput
+            style={styles.boxInput}
+            placeholder="title"
+            value={title}
+            onChangeText={setTitle}
+            autoFocus
+          />
+          <TextInput
+            style={styles.boxInput}
+            value={subtitle}
+            onChangeText={setSubtitle}
+            placeholder="subtitle"
+          />
+          <view style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonAdd}
+              onPress={() => {
+                onAdd(title, subtitle);
+              }}
+            >
+              <Text style={styles.buttonText}>Add</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonCancel} onPress={onClose}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+          </view>
+        </View>
+      </view>
+    </Modal>
+  );
+}
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    alignContent: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  boxContainer: {
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 20,
+  },
+
+  buttonText: {
+    fontWeight: "bold",
+    color: "#FFF",
+  },
+
+  buttonAdd: {
+    backgroundColor: "green",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    padding: 20,
+  },
+
+  buttonCancel: {
+    backgroundColor: "red",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    padding: 20,
+  },
+
+  buttonContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+    height: 70,
+  },
+
+  boxInput: {
+    alignSelf: "stretch",
+    height: 40,
+    borderRadius: 5,
+    backgroundColor: "#DDD",
+    margin: 5,
+  },
+});
