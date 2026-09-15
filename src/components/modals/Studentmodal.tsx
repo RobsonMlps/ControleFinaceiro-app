@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Modal,
   StyleSheet,
@@ -10,17 +10,17 @@ import {
 
 export type StudentModalProps = {
   visible: boolean;
-  onAdd: (title: string, subtitle: string) => void;
-  onClose: () => void;
+  onAdd: (title: string, subTitle: string) => void;
+  onCancel: () => void;
 };
 
 export default function StudentModal({
   visible,
   onAdd,
-  onClose,
+  onCancel,
 }: StudentModalProps) {
-  const [title, setTitle] = React.useState("");
-  const [subtitle, setSubtitle] = React.useState("");
+  const [title, setTitle] = useState("");
+  const [subTitle, setSubTitle] = useState("");
 
   return (
     <Modal
@@ -29,39 +29,44 @@ export default function StudentModal({
       transparent={true}
       onRequestClose={() => {}}
     >
-      <view style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.boxContainer}>
           <TextInput
             style={styles.boxInput}
-            placeholder="title"
+            placeholder="Title"
             value={title}
-            onChangeText={setTitle}
+            onChangeText={(text) => setTitle(text)}
             autoFocus
           />
+
           <TextInput
             style={styles.boxInput}
-            value={subtitle}
-            onChangeText={setSubtitle}
-            placeholder="subtitle"
+            value={subTitle}
+            onChangeText={(text) => setSubTitle(text)}
+            placeholder="SubTitle"
           />
-          <view style={styles.buttonContainer}>
+
+          <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.buttonAdd}
-              onPress={() => {
-                onAdd(title, subtitle);
-              }}
+              onPress={() => onAdd(title, subTitle)}
             >
               <Text style={styles.buttonText}>Add</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonCancel} onPress={onClose}>
+
+            <TouchableOpacity
+              style={styles.buttonCancel}
+              onPress={() => onCancel()}
+            >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
-          </view>
+          </View>
         </View>
-      </view>
+      </View>
     </Modal>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgba(0, 0, 0, 0.7)",
