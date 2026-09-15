@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { StyleSheet } from "react-native";
 
-import StudentsListScreen from "@/app/tabs/StudentsListScreen";
+import TransacoesListScreen from "./tabs/TransacoesListScreen";
 
 export default function FinanceiroScreen() {
   return (
@@ -12,7 +12,7 @@ export default function FinanceiroScreen() {
         Controle seu dinheiro de forma simples e organizada. Acompanhe suas
         receitas, despesas e mantenha suas finanças em dia.
       </ThemedText>
-      <StudentsListScreen />
+      <TransacoesListScreen />
     </ThemedView>
   );
 }
