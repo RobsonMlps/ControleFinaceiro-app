@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { ICategoria } from "@/interfaces/ICategoria";
+import { useEffect, useState } from "react";
 
 import {
   Modal,
@@ -14,23 +15,46 @@ export type CategoriaModalProps = {
 
   onAdd: (nome: string, icone: string, cor: string) => void;
 
+  onEdit: (id: number, nome: string, icone: string, cor: string) => void;
+
   onCancel: () => void;
+
+  onDelete: (id: number) => void;
+
+  categoria?: ICategoria;
 };
 
 export default function CategoriaModal({
   visible,
   onAdd,
+  onEdit,
   onCancel,
+  onDelete,
+  categoria,
 }: CategoriaModalProps) {
   const [nome, setNome] = useState("");
   const [icone, setIcone] = useState("");
   const [cor, setCor] = useState("");
 
+  useEffect(() => {
+    if (categoria) {
+      setNome(categoria.nome);
+      setIcone(categoria.icone);
+      setCor(categoria.cor);
+    } else {
+      setNome("");
+      setIcone("");
+      setCor("");
+    }
+  }, [categoria]);
+
   return (
     <Modal visible={visible} animationType="fade" transparent={true}>
       <View style={styles.container}>
         <View style={styles.boxContainer}>
-          <Text style={styles.title}>Nova Categoria</Text>
+          <Text style={styles.title}>
+            {categoria ? "Editar Categoria" : "Nova Categoria"}
+          </Text>
 
           <TextInput
             style={styles.boxInput}
@@ -54,16 +78,36 @@ export default function CategoriaModal({
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.buttonAdd}
-              onPress={() => onAdd(nome, icone, cor)}
-            >
-              <Text style={styles.buttonText}>Adicionar</Text>
-            </TouchableOpacity>
+            {!categoria && (
+              <TouchableOpacity
+                style={styles.buttonAdd}
+                onPress={() => onAdd(nome, icone, cor)}
+              >
+                <Text style={styles.buttonText}>Adicionar</Text>
+              </TouchableOpacity>
+            )}
+
+            {categoria && (
+              <TouchableOpacity
+                style={styles.buttonEdit}
+                onPress={() => onEdit(categoria.id, nome, icone, cor)}
+              >
+                <Text style={styles.buttonText}>Editar</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.buttonCancel} onPress={onCancel}>
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
+
+            {categoria && (
+              <TouchableOpacity
+                style={styles.buttonDelete}
+                onPress={() => onDelete(categoria.id)}
+              >
+                <Text style={styles.buttonText}>Excluir</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
@@ -118,6 +162,24 @@ const styles = StyleSheet.create({
   },
 
   buttonCancel: {
+    backgroundColor: "orange",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+  },
+
+  buttonEdit: {
+    backgroundColor: "blue",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+  },
+
+  buttonDelete: {
     backgroundColor: "red",
     borderRadius: 5,
     flex: 1,

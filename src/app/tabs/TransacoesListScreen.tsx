@@ -1,6 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-
 import { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import MyScrollView from "@/components/MyScollview";
 import { ThemedView } from "@/components/themed-view";
@@ -15,6 +14,10 @@ export default function TransacoesListScreen() {
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const [transacaoSelecionada, setTransacaoSelecionada] = useState<
+    ITransacao | undefined
+  >(undefined);
+
   // CREATE
   const onAdd = (
     descricao: string,
@@ -24,16 +27,11 @@ export default function TransacoesListScreen() {
     categoriaId: string,
   ) => {
     const novaTransacao: ITransacao = {
-      id: Math.random() * 1000,
-
+      id: Math.floor(Math.random() * 100000),
       descricao: descricao,
-
       valor: Number(valor),
-
       tipo: tipo,
-
       data: data,
-
       categoriaId: Number(categoriaId),
     };
 
@@ -44,14 +42,70 @@ export default function TransacoesListScreen() {
     setModalVisible(false);
   };
 
-  // ABRIR MODAL
+  // UPDATE
+  const onEdit = (
+    id: number,
+    descricao: string,
+    valor: string,
+    tipo: string,
+    data: string,
+    categoriaId: string,
+  ) => {
+    const transacoesEditadas = transacoes.map((transacao) => {
+      if (transacao.id === id) {
+        return {
+          ...transacao,
+          descricao: descricao,
+          valor: Number(valor),
+          tipo: tipo,
+          data: data,
+          categoriaId: Number(categoriaId),
+        };
+      }
+
+      return transacao;
+    });
+
+    setTransacoes(transacoesEditadas);
+
+    setModalVisible(false);
+    setTransacaoSelecionada(undefined);
+  };
+
+  // DELETE
+  const onDelete = (id: number) => {
+    const transacoesFiltradas = transacoes.filter(
+      (transacao) => transacao.id !== id,
+    );
+
+    setTransacoes(transacoesFiltradas);
+
+    setModalVisible(false);
+    setTransacaoSelecionada(undefined);
+  };
+
+  // ABRIR MODAL PARA ADICIONAR
   const openModal = () => {
+    setTransacaoSelecionada(undefined);
+    setModalVisible(true);
+  };
+
+  // ABRIR MODAL PARA EDITAR
+  const openEdit = (transacao: ITransacao) => {
+    setTransacaoSelecionada(transacao);
+    setModalVisible(true);
+  };
+
+  // ABRIR MODAL PARA EXCLUIR
+  const openDelete = (transacao: ITransacao) => {
+    setTransacaoSelecionada(transacao);
     setModalVisible(true);
   };
 
   // FECHAR MODAL
   const closeModal = () => {
     setModalVisible(false);
+    setTransacaoSelecionada(undefined);
   };
 
   return (
@@ -61,12 +115,14 @@ export default function TransacoesListScreen() {
         dark: "#1D3D47",
       }}
     >
+      {/* BOTÃO + */}
       <ThemedView style={styles.headerContainer}>
         <TouchableOpacity onPress={openModal}>
           <Text style={styles.headerButton}>+</Text>
         </TouchableOpacity>
       </ThemedView>
 
+      {/* LISTA DE TRANSAÇÕES */}
       <ThemedView style={styles.container}>
         {transacoes.map((transacao) => (
           <Transacao
@@ -75,14 +131,20 @@ export default function TransacoesListScreen() {
             valor={transacao.valor}
             tipo={transacao.tipo}
             data={transacao.data}
+            onEdit={() => openEdit(transacao)}
+            onDelete={() => openDelete(transacao)}
           />
         ))}
       </ThemedView>
 
+      {/* MODAL */}
       <TransacaoModal
         visible={modalVisible}
         onCancel={closeModal}
         onAdd={onAdd}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        transacao={transacaoSelecionada}
       />
     </MyScrollView>
   );

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { ITransacao } from "@/interfaces/ITransacao";
+import { useEffect, useState } from "react";
 
 import {
   Modal,
@@ -11,6 +12,7 @@ import {
 
 export type TransacaoModalProps = {
   visible: boolean;
+
   onAdd: (
     descricao: string,
     valor: string,
@@ -18,19 +20,52 @@ export type TransacaoModalProps = {
     data: string,
     categoriaId: string,
   ) => void;
+
+  onEdit: (
+    id: number,
+    descricao: string,
+    valor: string,
+    tipo: string,
+    data: string,
+    categoriaId: string,
+  ) => void;
+
   onCancel: () => void;
+
+  onDelete: (id: number) => void;
+
+  transacao?: ITransacao;
 };
 
 export default function TransacaoModal({
   visible,
   onAdd,
+  onEdit,
   onCancel,
+  onDelete,
+  transacao,
 }: TransacaoModalProps) {
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [tipo, setTipo] = useState("");
   const [data, setData] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
+
+  useEffect(() => {
+    if (transacao) {
+      setDescricao(transacao.descricao);
+      setValor(transacao.valor.toString());
+      setTipo(transacao.tipo);
+      setData(transacao.data);
+      setCategoriaId(transacao.categoriaId.toString());
+    } else {
+      setDescricao("");
+      setValor("");
+      setTipo("");
+      setData("");
+      setCategoriaId("");
+    }
+  }, [transacao]);
 
   return (
     <Modal visible={visible} animationType="fade" transparent={true}>
@@ -74,16 +109,51 @@ export default function TransacaoModal({
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.buttonAdd}
-              onPress={() => onAdd(descricao, valor, tipo, data, categoriaId)}
-            >
-              <Text style={styles.buttonText}>Adicionar</Text>
-            </TouchableOpacity>
+            {/* ADICIONAR */}
+            {!transacao && (
+              <TouchableOpacity
+                style={styles.buttonAdd}
+                onPress={() => onAdd(descricao, valor, tipo, data, categoriaId)}
+              >
+                <Text style={styles.buttonText}>Adicionar</Text>
+              </TouchableOpacity>
+            )}
 
+            {/* EDITAR */}
+            {transacao && (
+              <TouchableOpacity
+                style={styles.buttonEdit}
+                onPress={() =>
+                  onEdit(
+                    transacao.id,
+                    descricao,
+                    valor,
+                    tipo,
+                    data,
+                    categoriaId,
+                  )
+                }
+                disabled={!transacao.id || transacao.id <= 0}
+              >
+                <Text style={styles.buttonText}>Editar</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* CANCELAR */}
             <TouchableOpacity style={styles.buttonCancel} onPress={onCancel}>
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
+
+            {/* EXCLUIR */}
+            {transacao && (
+              <TouchableOpacity
+                style={styles.buttonDelete}
+                onPress={() => onDelete(transacao.id)}
+                disabled={!transacao.id || transacao.id <= 0}
+              >
+                <Text style={styles.buttonText}>Excluir</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
@@ -131,7 +201,25 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 
+  buttonEdit: {
+    backgroundColor: "blue",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+  },
+
   buttonCancel: {
+    backgroundColor: "orange",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+  },
+
+  buttonDelete: {
     backgroundColor: "red",
     borderRadius: 5,
     flex: 1,

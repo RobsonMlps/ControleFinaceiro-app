@@ -14,6 +14,10 @@ export default function CategoriasListScreen() {
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<
+    ICategoria | undefined
+  >(undefined);
+
   // CREATE
   const onAdd = (nome: string, icone: string, cor: string) => {
     const novaCategoria: ICategoria = {
@@ -33,14 +37,54 @@ export default function CategoriasListScreen() {
     setModalVisible(false);
   };
 
+  // UPDATE
+  const onEdit = (id: number, nome: string, icone: string, cor: string) => {
+    const categoriasEditadas = categorias.map((categoria) => {
+      if (categoria.id === id) {
+        return { ...categoria, nome, icone, cor };
+      }
+
+      return categoria;
+    });
+
+    setCategorias(categoriasEditadas);
+    setModalVisible(false);
+    setCategoriaSelecionada(undefined);
+  };
+
+  // DELETE
+  const onDelete = (id: number) => {
+    const categoriasFiltradas = categorias.filter(
+      (categoria) => categoria.id !== id,
+    );
+
+    setCategorias(categoriasFiltradas);
+    setModalVisible(false);
+    setCategoriaSelecionada(undefined);
+  };
+
   // ABRIR MODAL
   const openModal = () => {
+    setCategoriaSelecionada(undefined);
+    setModalVisible(true);
+  };
+
+  // ABRIR MODAL PARA EDITAR
+  const openEdit = (categoria: ICategoria) => {
+    setCategoriaSelecionada(categoria);
+    setModalVisible(true);
+  };
+
+  // ABRIR MODAL PARA EXCLUIR
+  const openDelete = (categoria: ICategoria) => {
+    setCategoriaSelecionada(categoria);
     setModalVisible(true);
   };
 
   // FECHAR MODAL
   const closeModal = () => {
     setModalVisible(false);
+    setCategoriaSelecionada(undefined);
   };
 
   return (
@@ -63,6 +107,8 @@ export default function CategoriasListScreen() {
             nome={categoria.nome}
             icone={categoria.icone}
             cor={categoria.cor}
+            onEdit={() => openEdit(categoria)}
+            onDelete={() => openDelete(categoria)}
           />
         ))}
       </ThemedView>
@@ -71,6 +117,9 @@ export default function CategoriasListScreen() {
         visible={modalVisible}
         onCancel={closeModal}
         onAdd={onAdd}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        categoria={categoriaSelecionada}
       />
     </MyScrollView>
   );
