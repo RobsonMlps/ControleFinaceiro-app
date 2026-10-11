@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import MyScrollView from "@/components/MyScollview";
@@ -9,6 +9,9 @@ import Transacao from "@/components/transacao/Transacao";
 
 import { ITransacao } from "@/interfaces/ITransacao";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+
 export default function TransacoesListScreen() {
   const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
 
@@ -17,6 +20,20 @@ export default function TransacoesListScreen() {
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<
     ITransacao | undefined
   >(undefined);
+
+  useEffect(() => {
+    async function dataTransacoes() {
+      try {
+        const data = await AsyncStorage.getItem(
+          "@ControleFinanceiro-app:transacoes",
+        );
+        const transacaoData = data != null ? JSON.parse(data) : [];
+        setTransacoes(transacaoData);
+      } catch (e) {}
+    }
+
+    dataTransacoes();
+  }, []);
 
   // CREATE
   const onAdd = (
@@ -38,6 +55,10 @@ export default function TransacoesListScreen() {
     const transacoesPlus: ITransacao[] = [...transacoes, novaTransacao];
 
     setTransacoes(transacoesPlus);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:transacoes",
+      JSON.stringify(transacoesPlus),
+    );
 
     setModalVisible(false);
   };
@@ -67,6 +88,10 @@ export default function TransacoesListScreen() {
     });
 
     setTransacoes(transacoesEditadas);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:transacoes",
+      JSON.stringify(transacoesEditadas),
+    );
 
     setModalVisible(false);
     setTransacaoSelecionada(undefined);
@@ -79,6 +104,10 @@ export default function TransacoesListScreen() {
     );
 
     setTransacoes(transacoesFiltradas);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:transacoes",
+      JSON.stringify(transacoesFiltradas),
+    );
 
     setModalVisible(false);
     setTransacaoSelecionada(undefined);
@@ -102,6 +131,13 @@ export default function TransacoesListScreen() {
     setModalVisible(true);
   };
 
+  const navigateToDetails = (selectdTansacao: ITransacao) => {
+    router.push({
+      pathname: "/Screens/TransacaoDetailScreen",
+      params: { transacaoId: selectdTansacao.id },
+    });
+  };
+
   // FECHAR MODAL
   const closeModal = () => {
     setModalVisible(false);
@@ -120,6 +156,26 @@ export default function TransacoesListScreen() {
         <TouchableOpacity onPress={openModal}>
           <Text style={styles.headerButton}>+</Text>
         </TouchableOpacity>
+      </ThemedView>
+
+      <ThemedView style={styles.container}>
+        {transacoes.map((transacao) => (
+          <TouchableOpacity onPress={() => navigateToDetails(transacao)}>
+            <Transacao
+              key={transacao.id}
+              descricao={transacao.descricao}
+              valor={transacao.valor}
+              tipo={transacao.tipo}
+              data={transacao.data}
+              onEdit={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+              onDelete={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+            />
+          </TouchableOpacity>
+        ))}
       </ThemedView>
 
       {/* LISTA DE TRANSAÇÕES */}

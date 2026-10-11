@@ -2,10 +2,12 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import MyScrollView from "@/components/MyScollview";
 import { ThemedView } from "@/components/themed-view";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Categoria from "@/components/categoria/Categoria";
 import CategoriaModal from "@/components/modals/CategoriaModal";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ICategoria } from "@/interfaces/ICategoria";
 
@@ -17,6 +19,20 @@ export default function CategoriasListScreen() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<
     ICategoria | undefined
   >(undefined);
+
+  useEffect(() => {
+    async function dataCategorias() {
+      try {
+        const data = await AsyncStorage.getItem(
+          "@ControleFinanceiro-app:categorias",
+        );
+        const categoriaData = data != null ? JSON.parse(data) : [];
+        setCategorias(categoriaData);
+      } catch (e) {}
+    }
+
+    dataCategorias();
+  }, []);
 
   // CREATE
   const onAdd = (nome: string, icone: string, cor: string) => {
@@ -33,6 +49,10 @@ export default function CategoriasListScreen() {
     const categoriasPlus: ICategoria[] = [...categorias, novaCategoria];
 
     setCategorias(categoriasPlus);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:categorias",
+      JSON.stringify(categoriasPlus),
+    );
 
     setModalVisible(false);
   };
@@ -48,6 +68,10 @@ export default function CategoriasListScreen() {
     });
 
     setCategorias(categoriasEditadas);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:categorias",
+      JSON.stringify(categoriasEditadas),
+    );
     setModalVisible(false);
     setCategoriaSelecionada(undefined);
   };
@@ -59,6 +83,10 @@ export default function CategoriasListScreen() {
     );
 
     setCategorias(categoriasFiltradas);
+    AsyncStorage.setItem(
+      "@ControleFinanceiro-app:categorias",
+      JSON.stringify(categoriasFiltradas),
+    );
     setModalVisible(false);
     setCategoriaSelecionada(undefined);
   };

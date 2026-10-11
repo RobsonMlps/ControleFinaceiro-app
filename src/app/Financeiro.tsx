@@ -7,6 +7,7 @@ import { WebBadge } from "@/components/web-badge";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 
 import CategoriasListScreen from "./tabs/CategoriaListScreen";
+import Localizacao from "./tabs/Localizacao";
 import TransacoesListScreen from "./tabs/TransacoesListScreen";
 
 export default function FinanceiroScreen() {
@@ -27,6 +28,9 @@ export default function FinanceiroScreen() {
             <ThemedText style={styles.description}>
               Controle seu dinheiro de forma simples e organizada. Acompanhe
               suas receitas, despesas e mantenha suas finanças em dia.
+            </ThemedText>
+            <ThemedText style={styles.title}>
+              Localização: <Localizacao />
             </ThemedText>
           </ThemedView>
 
