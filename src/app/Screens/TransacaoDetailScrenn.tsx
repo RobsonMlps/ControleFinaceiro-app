@@ -1,3 +1,4 @@
+import TransacaoModal from "@/components/modals/TransacaoModal";
 import { ThemedView } from "@/components/themed-view";
 import { ITransacao } from "@/interfaces/ITransacao";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -6,7 +7,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function TransacaoDetailScreen() {
-  const { transacaoId } = useLocalSearchParams();
+  const { transacaoId } = useLocalSearchParams<{ transacaoId: string }>();
   const [transacaoForDetail, setTransacaoForDetail] = useState<ITransacao>();
   const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -17,53 +18,92 @@ export default function TransacaoDetailScreen() {
         const data = await AsyncStorage.getItem(
           "@ControleFinanceiro-app:transacoes",
         );
-        const transacaoData = data != null ? JSON.parse(data) : [];
+        const transacaoData: ITransacao[] = data ? JSON.parse(data) : [];
         setTransacoes(transacaoData);
-
-        transacaoData.forEach((element: ITransacao) => {
-          if (element.id.toString() == transacaoId)
-            setTransacaoForDetail(element);
-        });
-      } catch (e) {}
+        setTransacaoForDetail(
+          transacaoData.find(
+            (transacao) => transacao.id.toString() === transacaoId,
+          ),
+        );
+      } catch {
+        setTransacoes([]);
+        setTransacaoForDetail(undefined);
+      }
     }
 
     getData();
-  }, []);
+  }, [transacaoId]);
 
-  const onDelete = () => {
-    if (transacaoForDetail) {
-      const newTansacoes: Array<ITransacao> = [];
+  const onAdd = () => {};
 
-      for (let index = 0; index < transacoes.length; index++) {
-        const transacao = transacoes[index];
+  const onEdit = (
+    id: number,
+    descricao: string,
+    valor: string,
+    tipo: string,
+    data: string,
+    categoriaId: string,
+  ) => {
+    const transacoesAtualizadas = transacoes.map((transacao) =>
+      transacao.id === id
+        ? {
+            ...transacao,
+            descricao,
+            valor: Number(valor),
+            tipo,
+            data,
+            categoriaId: Number(categoriaId),
+          }
+        : transacao,
+    );
 
-        if (transacao.id != transacaoForDetail!.id) {
-          newTansacoes.push(transacao);
-        }
-      }
-      setTransacoes(newTansacoes);
-      AsyncStorage.setItem(
-        "@ControleFinanceiro-app:transacoes",
-        JSON.stringify(newTansacoes),
-      );
-    }
+    setTransacoes(transacoesAtualizadas);
+    setTransacaoForDetail(
+      transacoesAtualizadas.find((transacao) => transacao.id === id),
+    );
+    void AsyncStorage.setItem(
+      "@ControleFinanceiro-app:transacoes",
+      JSON.stringify(transacoesAtualizadas),
+    );
+    setModalVisible(false);
+  };
+
+  const onDelete = async (id: number) => {
+    const transacoesAtualizadas = transacoes.filter(
+      (transacao) => transacao.id !== id,
+    );
+
+    setTransacoes(transacoesAtualizadas);
+    await AsyncStorage.setItem(
+      "@ControleFinanceiro-app:transacoes",
+      JSON.stringify(transacoesAtualizadas),
+    );
     router.replace("/tabs/TransacoesListScreen");
   };
 
-  const openModal = () => {
-    setModalVisible(true);
-  };
+  const onCancel = () => setModalVisible(false);
 
   return (
     <View>
       <ThemedView style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => onDelete()}>
+        <TouchableOpacity
+          onPress={() => transacaoForDetail && onDelete(transacaoForDetail.id)}
+          disabled={!transacaoForDetail}
+        >
           <Text style={styles.headerButton}>X</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          disabled={!transacaoForDetail}
+        >
+          <Text style={styles.headerButton}>Editar</Text>
         </TouchableOpacity>
       </ThemedView>
       <View style={styles.box}>
         <Text style={styles.container}>
-          {transacaoForDetail ? transacaoForDetail.categoriaId : ""}
+          {transacaoForDetail
+            ? `Categoria: ${transacaoForDetail.categoriaId}`
+            : "Transação não encontrada."}
         </Text>
         <Text style={styles.container}>
           {transacaoForDetail ? transacaoForDetail.descricao : ""}
@@ -78,6 +118,14 @@ export default function TransacaoDetailScreen() {
           {transacaoForDetail ? transacaoForDetail.data : ""}
         </Text>
       </View>
+      <TransacaoModal
+        visible={modalVisible}
+        transacao={transacaoForDetail}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onCancel={onCancel}
+      />
     </View>
   );
 }

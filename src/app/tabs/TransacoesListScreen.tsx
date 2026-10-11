@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
+import TransacaoModal from "@/components/modals/TransacaoModal";
 import MyScrollView from "@/components/MyScollview";
 import { ThemedView } from "@/components/themed-view";
-
-import TransacaoModal from "@/components/modals/TransacaoModal";
 import Transacao from "@/components/transacao/Transacao";
 
 import { ITransacao } from "@/interfaces/ITransacao";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 
 export default function TransacoesListScreen() {
   const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
@@ -44,7 +42,7 @@ export default function TransacoesListScreen() {
     categoriaId: string,
   ) => {
     const novaTransacao: ITransacao = {
-      id: Math.floor(Math.random() * 100000),
+      id: Date.now(),
       descricao: descricao,
       valor: Number(valor),
       tipo: tipo,
@@ -131,13 +129,6 @@ export default function TransacoesListScreen() {
     setModalVisible(true);
   };
 
-  const navigateToDetails = (selectdTansacao: ITransacao) => {
-    router.push({
-      pathname: "/Screens/TransacaoDetailScreen",
-      params: { transacaoId: selectdTansacao.id },
-    });
-  };
-
   // FECHAR MODAL
   const closeModal = () => {
     setModalVisible(false);
@@ -160,27 +151,6 @@ export default function TransacoesListScreen() {
 
       <ThemedView style={styles.container}>
         {transacoes.map((transacao) => (
-          <TouchableOpacity onPress={() => navigateToDetails(transacao)}>
-            <Transacao
-              key={transacao.id}
-              descricao={transacao.descricao}
-              valor={transacao.valor}
-              tipo={transacao.tipo}
-              data={transacao.data}
-              onEdit={function (): void {
-                throw new Error("Function not implemented.");
-              }}
-              onDelete={function (): void {
-                throw new Error("Function not implemented.");
-              }}
-            />
-          </TouchableOpacity>
-        ))}
-      </ThemedView>
-
-      {/* LISTA DE TRANSAÇÕES */}
-      <ThemedView style={styles.container}>
-        {transacoes.map((transacao) => (
           <Transacao
             key={transacao.id}
             descricao={transacao.descricao}
@@ -193,14 +163,21 @@ export default function TransacoesListScreen() {
         ))}
       </ThemedView>
 
-      {/* MODAL */}
+      {transacoes.length === 0 && (
+        <ThemedView style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>
+            Nenhuma transação cadastrada.
+          </Text>
+        </ThemedView>
+      )}
+
       <TransacaoModal
         visible={modalVisible}
-        onCancel={closeModal}
+        transacao={transacaoSelecionada}
         onAdd={onAdd}
         onEdit={onEdit}
         onDelete={onDelete}
-        transacao={transacaoSelecionada}
+        onCancel={closeModal}
       />
     </MyScrollView>
   );
@@ -222,5 +199,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 30,
     paddingHorizontal: 20,
+  },
+
+  emptyState: {
+    alignItems: "center",
+    padding: 24,
+  },
+
+  emptyStateText: {
+    color: "#555",
   },
 });

@@ -8,7 +8,6 @@ import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 
 import CategoriasListScreen from "./tabs/CategoriaListScreen";
 import Localizacao from "./tabs/Localizacao";
-import TransacoesListScreen from "./tabs/TransacoesListScreen";
 
 export default function FinanceiroScreen() {
   return (
@@ -32,15 +31,6 @@ export default function FinanceiroScreen() {
             <ThemedText style={styles.title}>
               Localização: <Localizacao />
             </ThemedText>
-          </ThemedView>
-
-          {/* Transações */}
-          <ThemedView type="backgroundElement" style={styles.sectionContainer}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Transações
-            </ThemedText>
-
-            <TransacoesListScreen />
           </ThemedView>
 
           {/* Categorias */}
