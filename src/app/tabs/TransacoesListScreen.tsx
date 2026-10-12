@@ -9,6 +9,7 @@ import Transacao from "@/components/transacao/Transacao";
 import { ITransacao } from "@/interfaces/ITransacao";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 
 export default function TransacoesListScreen() {
   const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
@@ -129,6 +130,13 @@ export default function TransacoesListScreen() {
     setModalVisible(true);
   };
 
+  const openDetails = (transacao: ITransacao) => {
+    router.push({
+      pathname: "/Screens/TransacaoDetailScrenn",
+      params: { transacaoId: transacao.id.toString() },
+    });
+  };
+
   // FECHAR MODAL
   const closeModal = () => {
     setModalVisible(false);
@@ -157,6 +165,7 @@ export default function TransacoesListScreen() {
             valor={transacao.valor}
             tipo={transacao.tipo}
             data={transacao.data}
+            onPress={() => openDetails(transacao)}
             onEdit={() => openEdit(transacao)}
             onDelete={() => openDelete(transacao)}
           />

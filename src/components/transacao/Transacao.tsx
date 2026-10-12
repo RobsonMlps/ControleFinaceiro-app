@@ -5,6 +5,7 @@ export type TransacaoProps = {
   valor: number;
   tipo: string;
   data: string;
+  onPress: () => void;
   onEdit: () => void;
   onDelete: () => void;
 };
@@ -14,18 +15,21 @@ export default function Transacao({
   valor,
   tipo,
   data,
+  onPress,
   onEdit,
   onDelete,
 }: TransacaoProps) {
   return (
     <View style={styles.box}>
-      <Text style={styles.descricao}>{descricao}</Text>
+      <TouchableOpacity onPress={onPress} accessibilityRole="button">
+        <Text style={styles.descricao}>{descricao}</Text>
 
-      <Text>Valor: R$ {valor.toFixed(2)}</Text>
+        <Text>Valor: R$ {valor.toFixed(2)}</Text>
 
-      <Text>Tipo: {tipo}</Text>
+        <Text>Tipo: {tipo}</Text>
 
-      <Text>Data: {data}</Text>
+        <Text>Data: {data}</Text>
+      </TouchableOpacity>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.buttonEdit} onPress={onEdit}>

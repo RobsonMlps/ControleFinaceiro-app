@@ -78,7 +78,7 @@ export default function TransacaoDetailScreen() {
       "@ControleFinanceiro-app:transacoes",
       JSON.stringify(transacoesAtualizadas),
     );
-    router.replace("/tabs/TransacoesListScreen");
+    router.replace("/TelaTransacao");
   };
 
   const onCancel = () => setModalVisible(false);
